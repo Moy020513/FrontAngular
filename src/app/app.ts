@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { AfterViewInit, Component, OnInit, signal } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +7,30 @@ import { Component, signal } from '@angular/core';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('citasApp');
+   
+
+   title = 'citasApp';
+   otra = 'Hola mundo';
+
+   /*
+   contador: number = 0;
+   limite: boolean = false;
+
+
+   ngOnInit(): void {
+     alert ('Se está iniciando el componente');
+   }
+
+   ngAfterViewInit(): void {
+     alert ('Se ha renderizado la vista del componente');
+   }
+
+
+   aumentarContador(): void {
+    this.contador++;
+    if (this.contador >= 10) {
+      this.limite = true;
+    }
+   }
+  */
 }
