@@ -5,12 +5,21 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { Dashboard } from './components/dashboard/dashboard';
 import { Login } from './components/login/login';
-
+import { Navbar } from './navbar/navbar';
+import { Footer } from './footer/footer';
+import { Usuarios } from './components/usuarios/usuarios';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptors';
 
 @NgModule({
-  declarations: [App, Dashboard, Login],
-  imports: [BrowserModule, AppRoutingModule],
-  providers: [provideBrowserGlobalErrorListeners()],
+  declarations: [App, Dashboard, Login, Navbar, Footer, Usuarios],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true}
+  ],
   bootstrap: [App],
 })
 export class AppModule {}
