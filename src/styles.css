@@ -21,3 +21,7 @@ footer {
     width: 100%;
     z-index: 1000;
 }
+
+.tablee {
+    background: linear-gradient(135deg, #000407, #000000) !important; 
+}
