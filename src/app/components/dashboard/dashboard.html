@@ -1,7 +1,100 @@
-<div class="app-container">
-    <app-navbar/>
-    <main> 
-        <router-outlet/>
-    </main>
-    <app-footer/>
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <!-- Si estamos en la ruta raíz del dashboard, mostramos las estadísticas -->
+    <ng-container *ngIf="isRootRoute">
+        <!-- Mensaje de bienvenida -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-hotel fa-3x mb-3" style="color: #004d99;"></i>
+                        <h5>Bienvenido al Sistema de Gestión Hotelera</h5>
+                        <p class="mb-0">Selecciona una opción del menú para comenzar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tarjetas de estadísticas -->
+        <div class="row g-4 mb-4">
+            <!-- Huéspedes -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="stat-label text-muted mb-1">Huéspedes</p>
+                                <h2 class="stat-number mb-0">{{ totalHuespedes }}</h2>
+                                <small class="text-muted">Registrados en el sistema</small>
+                            </div>
+                            <div class="stat-icon bg-primary">
+                                <i class="fas fa-users fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Habitaciones -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="stat-label text-muted mb-1">Habitaciones</p>
+                                <h2 class="stat-number mb-0">{{ totalHabitaciones }}</h2>
+                                <small class="text-muted">Habitaciones disponibles</small>
+                            </div>
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-bed fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservas -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="stat-label text-muted mb-1">Reservas</p>
+                                <h2 class="stat-number mb-0">{{ totalReservas }}</h2>
+                                <small class="text-muted">Reservas activas</small>
+                            </div>
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-calendar-check fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuarios (solo admin) -->
+            <div class="col-xl-3 col-lg-6 col-md-6" *ngIf="showMenuAdmin">
+                <div class="card stat-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="stat-label text-muted mb-1">Usuarios</p>
+                                <h2 class="stat-number mb-0">{{ totalUsuarios }}</h2>
+                                <small class="text-muted">Usuarios del sistema</small>
+                            </div>
+                            <div class="stat-icon bg-danger">
+                                <i class="fas fa-user-shield fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </ng-container>
+
+    <!-- Aquí se renderizan los componentes hijos (huespedes, habitaciones, reservas, usuarios) -->
+    <router-outlet></router-outlet>
 </div>
+
+<app-footer></app-footer>
