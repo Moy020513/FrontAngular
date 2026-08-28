@@ -1,0 +1,126 @@
+<div class="container-fluid mt-4">
+    <h2>Reservaciones</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button (click)="toggleForm()" class="btn text-white" style="background: linear-gradient(135deg, #004d99, #000000)">
+            <i class="fa-solid fa-plus"></i>
+            Registrar Reservación
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-primary">
+                <tr style="text-align: center;">
+                    <th scope="col">#</th>
+                    <th scope="col">Huésped</th>
+                    <th scope="col">Habitación</th>
+                    <th scope="col">Fecha y Hora</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="text-align: center;">
+                <tr *ngFor="let reservacion of reservaciones; let i = index">
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td>{{ getNombreHuesped(reservacion) }}</td>
+                    <td>{{ getNumeroHabitacion(reservacion) }}</td>
+                    <td>{{ formatearFecha(reservacion.fechaHora) }}</td>
+                    <td>
+                        <span class="badge bg-{{ getEstadoColor(reservacion.estadoReserva) }}">
+                            {{ getEstadoLabel(reservacion.estadoReserva) }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-primary btn-sm me-1" (click)="editarReservacion(reservacion)">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm me-1" (click)="eliminarReservacion(reservacion.id)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fa fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li *ngFor="let estado of estadosReserva">
+                                        <button class="dropdown-item" (click)="cambiarEstado(reservacion, estado)"
+                                            [disabled]="reservacion.estadoReserva === estado">
+                                            {{ getEstadoLabel(estado) }}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para registrar/actualizar reservación -->
+    <div class="modal fade" #reservacionModalRef tabindex="-1" aria-labelledby="reservacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #004d99, #000000)">
+                    <h5 class="modal-title" id="reservacionModalLabel">{{ textoModal }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="reservacionForm" (ngSubmit)="onSubmit()">
+                        <div class="mb-3">
+                            <label for="idHuesped" class="form-label">Huésped *</label>
+                            <select id="idHuesped" class="form-select" formControlName="idHuesped">
+                                <option value="" disabled>Seleccione un huésped</option>
+                                <option *ngFor="let huesped of huespedes" [value]="huesped.id">
+                                    {{ getNombreCompletoHuesped(huesped) }} - {{ huesped.documento }}
+                                </option>
+                            </select>
+                            <div *ngIf="reservacionForm.get('idHuesped')?.invalid && reservacionForm.get('idHuesped')?.touched"
+                                class="text-danger small mt-1">
+                                <span *ngIf="reservacionForm.get('idHuesped')?.errors?.['required']">
+                                    El huésped es requerido
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="idHabitacion" class="form-label">Habitación *</label>
+                            <select id="idHabitacion" class="form-select" formControlName="idHabitacion">
+                                <option value="" disabled>Seleccione una habitación</option>
+                                <option *ngFor="let habitacion of habitaciones" [value]="habitacion.id">
+                                    #{{ habitacion.numero }} - {{ habitacion.tipo }} (Cap: {{ habitacion.capacidad }})
+                                </option>
+                            </select>
+                            <div *ngIf="reservacionForm.get('idHabitacion')?.invalid && reservacionForm.get('idHabitacion')?.touched"
+                                class="text-danger small mt-1">
+                                <span *ngIf="reservacionForm.get('idHabitacion')?.errors?.['required']">
+                                    La habitación es requerida
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaHora" class="form-label">Fecha y Hora *</label>
+                            <input id="fechaHora" type="datetime-local" class="form-control" formControlName="fechaHora" />
+                            <div *ngIf="reservacionForm.get('fechaHora')?.invalid && reservacionForm.get('fechaHora')?.touched"
+                                class="text-danger small mt-1">
+                                <span *ngIf="reservacionForm.get('fechaHora')?.errors?.['required']">
+                                    La fecha y hora son requeridas
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn px-4 text-white" style="background: linear-gradient(135deg, #004d99, #000000)" [disabled]="reservacionForm.invalid">
+                                <i class="fa fa-save"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

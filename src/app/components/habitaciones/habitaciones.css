@@ -1,0 +1,12 @@
+/* Estilos adicionales si necesitas personalizar algo */
+.table th {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    margin: 0 2px;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+}

@@ -1,0 +1,20 @@
+.table th {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    margin: 0 2px;
+}
+
+.btn-group .btn-sm {
+    margin: 0;
+}
+
+.dropdown-menu {
+    min-width: 120px;
+}
+
+.dropdown-item:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
