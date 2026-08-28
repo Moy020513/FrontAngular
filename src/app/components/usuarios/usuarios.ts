@@ -92,6 +92,13 @@ export class Usuarios implements OnInit, AfterViewInit{
 
     if(this.isEditMode){
       //ACTUALIZANDO
+      this.usuarioService.putUsuario(datosUsuario, datosUsuario.username).subscribe({
+        next: usuarioActualizado => {
+          this.cdr.detectChanges();
+          Swal.fire('Actualizando', 'Contraseña usuario actualizada', 'success');
+          this.modalInstance.hide();
+        }
+      })
     }else{
       //REGISTRANDO
       this.usuarioService.postUsuario(datosUsuario).subscribe({
