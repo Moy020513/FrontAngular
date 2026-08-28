@@ -12,7 +12,9 @@
         <thead class="table-primary">
             <tr style="text-align: center;">
                 <th scope="col">#</th>
-                <th scope="col">Nombre Completo</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido Paterno</th>
+                <th scope="col">Apellido Materno</th>
                 <th scope="col">Email</th>
                 <th scope="col">Teléfono</th>
                 <th scope="col">Documento</th>
@@ -23,7 +25,9 @@
         <tbody style="text-align: center;">
             <tr *ngFor="let huesped of huespedes; let i = index">
                 <th scope="row">{{ i + 1 }}</th>
-                <td>{{ getNombreCompleto(huesped) }}</td>
+                <td>{{ huesped.nombre }}</td>
+                <td>{{ huesped.paterno }}</td>
+                <td>{{ huesped.materno }}</td>
                 <td>{{ huesped.email }}</td>
                 <td>{{ huesped.telefono }}</td>
                 <td>{{ huesped.documento }}</td>

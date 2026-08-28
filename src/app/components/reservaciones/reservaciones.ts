@@ -4,7 +4,14 @@ import Swal from 'sweetalert2';
 import { ReservacionesService } from '../../services/reservaciones';
 import { HuespedesService } from '../../services/huespedes';
 import { HabitacionesService } from '../../services/habitaciones';
-import { ReservacionRequest, ReservacionResponse, formatearFecha, getEstadoReservaLabel, getEstadoReservaColor, EstadoReserva } from '../../models/Reservacion.model';
+import { 
+  ReservacionRequest, 
+  ReservacionResponse, 
+  formatearFecha, 
+  getEstadoReservaLabel, 
+  getEstadoReservaColor, 
+  EstadoReserva 
+} from '../../models/Reservacion.model';
 import { HuespedResponse, getNombreCompleto } from '../../models/Huesped.model';
 import { HabitacionResponse } from '../../models/Habitacion.model';
 
@@ -29,7 +36,6 @@ export class Reservaciones implements OnInit, AfterViewInit {
   isEditMode: boolean = false;
   selectedReservacionId: number | null = null;
 
-  // Para el filtro de estado
   estadosReserva: string[] = Object.values(EstadoReserva);
 
   constructor(
@@ -43,7 +49,25 @@ export class Reservaciones implements OnInit, AfterViewInit {
       idHuesped: ['', [Validators.required]],
       idHabitacion: ['', [Validators.required]],
       fechaHora: ['', [Validators.required]],
+      fechaSalida: ['', [Validators.required]],
+    }, {
+      validators: this.validarFechas
     });
+  }
+
+  validarFechas(group: FormGroup): any {
+    const fechaEntrada = group.get('fechaHora')?.value;
+    const fechaSalida = group.get('fechaSalida')?.value;
+    
+    if (fechaEntrada && fechaSalida) {
+      const entrada = new Date(fechaEntrada);
+      const salida = new Date(fechaSalida);
+      
+      if (salida <= entrada) {
+        return { fechaInvalida: true };
+      }
+    }
+    return null;
   }
 
   ngOnInit(): void {
@@ -120,14 +144,14 @@ export class Reservaciones implements OnInit, AfterViewInit {
     if (reservacion.huesped) {
       return this.getNombreCompletoHuesped(reservacion.huesped);
     }
-    return `ID: ${reservacion.idHuesped}`;
+    return `ID: ${reservacion.id}`;
   }
 
   getNumeroHabitacion(reservacion: ReservacionResponse): string {
     if (reservacion.habitacion) {
       return `#${reservacion.habitacion.numero}`;
     }
-    return `ID: ${reservacion.idHabitacion}`;
+    return `ID: ${reservacion.id}`;
   }
 
   toggleForm(): void {
@@ -141,41 +165,44 @@ export class Reservaciones implements OnInit, AfterViewInit {
     this.selectedReservacionId = reservacion.id;
     this.textoModal = `Actualizando reservación #${reservacion.id}`;
 
-    // Convertir fecha para el input datetime-local
-    const fecha = new Date(reservacion.fechaHora);
-    const fechaFormateada = fecha.toISOString().slice(0, 16);
+    const fechaEntrada = new Date(reservacion.fechaHora);
+    const fechaSalida = new Date(reservacion.fechaSalida);
+    const fechaEntradaFormateada = fechaEntrada.toISOString().slice(0, 16);
+    const fechaSalidaFormateada = fechaSalida.toISOString().slice(0, 16);
 
     this.reservacionForm.patchValue({
-      idHuesped: reservacion.idHuesped,
-      idHabitacion: reservacion.idHabitacion,
-      fechaHora: fechaFormateada
+      idHuesped: reservacion.huesped?.id || reservacion.id,
+      idHabitacion: reservacion.habitacion?.id || reservacion.id,
+      fechaHora: fechaEntradaFormateada,
+      fechaSalida: fechaSalidaFormateada
     });
     this.modalInstance.show();
   }
 
   onSubmit(): void {
-    if (this.reservacionForm.invalid) return;
+    if (this.reservacionForm.invalid) {
+      if (this.reservacionForm.errors?.['fechaInvalida']) {
+        Swal.fire('Error', 'La fecha de salida debe ser posterior a la fecha de entrada', 'warning');
+      }
+      return;
+    }
 
     const formValue = this.reservacionForm.value;
     
-    // Convertir fecha al formato esperado por el backend
-    const fecha = new Date(formValue.fechaHora);
-    const fechaFormateada = fecha.toLocaleString('es-MX', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).replace(/\//g, '/');
+    const fechaEntrada = new Date(formValue.fechaHora);
+    const fechaSalida = new Date(formValue.fechaSalida);
+    
+    const fechaEntradaFormateada = this.formatearFechaParaBackend(fechaEntrada);
+    const fechaSalidaFormateada = this.formatearFechaParaBackend(fechaSalida);
 
     const datosReservacion: ReservacionRequest = {
       idHuesped: formValue.idHuesped,
       idHabitacion: formValue.idHabitacion,
-      fechaHora: fechaFormateada
+      fechaHora: fechaEntradaFormateada,
+      fechaSalida: fechaSalidaFormateada
     };
 
     if (this.isEditMode && this.selectedReservacionId !== null) {
-      // ACTUALIZANDO
       this.reservacionService.putReservacion(datosReservacion, this.selectedReservacionId).subscribe({
         next: reservacionActualizada => {
           const index = this.reservaciones.findIndex(r => r.id === reservacionActualizada.id);
@@ -188,11 +215,11 @@ export class Reservaciones implements OnInit, AfterViewInit {
         },
         error: (error) => {
           console.error(error);
-          Swal.fire('Error', error.error?.message || 'No se pudo actualizar la reservación', 'error');
+          const mensaje = error.error?.message || 'No se pudo actualizar la reservación';
+          Swal.fire('Error', mensaje, 'error');
         }
       });
     } else {
-      // REGISTRANDO
       this.reservacionService.postReservacion(datosReservacion).subscribe({
         next: nuevaReservacion => {
           this.reservaciones.push(nuevaReservacion);
@@ -202,10 +229,21 @@ export class Reservaciones implements OnInit, AfterViewInit {
         },
         error: (error) => {
           console.error(error);
-          Swal.fire('Error', error.error?.message || 'No se pudo registrar la reservación', 'error');
+          const mensaje = error.error?.message || 'No se pudo registrar la reservación';
+          Swal.fire('Error', mensaje, 'error');
         }
       });
     }
+  }
+
+  // Método auxiliar para formatear fecha al formato del backend
+  private formatearFechaParaBackend(fecha: Date): string {
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    const horas = String(fecha.getHours()).padStart(2, '0');
+    const minutos = String(fecha.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${anio} ${horas}:${minutos}`;
   }
 
   eliminarReservacion(id: number): void {
@@ -229,41 +267,44 @@ export class Reservaciones implements OnInit, AfterViewInit {
           },
           error: (error) => {
             console.error(error);
-            Swal.fire('Error', error.error?.message || 'No se pudo eliminar la reservación', 'error');
+            const mensaje = error.error?.message || 'No se pudo eliminar la reservación';
+            Swal.fire('Error', mensaje, 'error');
           }
         });
       }
     });
   }
 
-  // Cambiar estado de la reservación
-  cambiarEstado(reservacion: ReservacionResponse, nuevoEstado: string): void {
+  // El método cambiarEstado ya está bien
+cambiarEstado(reservacion: ReservacionResponse, nuevoEstado: string): void {
     if (reservacion.estadoReserva === nuevoEstado) return;
 
     Swal.fire({
-      title: '¿Cambiar estado?',
-      text: `¿Deseas cambiar el estado a "${this.getEstadoLabel(nuevoEstado)}"?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, cambiar',
-      cancelButtonText: 'Cancelar'
+        title: '¿Cambiar estado?',
+        text: `¿Deseas cambiar el estado a "${this.getEstadoLabel(nuevoEstado)}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Cancelar'
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.reservacionService.actualizarEstadoReservacion(reservacion.id, nuevoEstado).subscribe({
-          next: reservacionActualizada => {
-            const index = this.reservaciones.findIndex(r => r.id === reservacionActualizada.id);
-            if (index !== -1) {
-              this.reservaciones[index] = reservacionActualizada;
-            }
-            this.cdr.detectChanges();
-            Swal.fire('Estado actualizado', `Estado cambiado a "${this.getEstadoLabel(nuevoEstado)}"`, 'success');
-          },
-          error: (error) => {
-            console.error(error);
-            Swal.fire('Error', error.error?.message || 'No se pudo cambiar el estado', 'error');
-          }
-        });
-      }
+        if (result.isConfirmed) {
+            // Aquí se envía el string, el servicio lo convierte a número
+            this.reservacionService.actualizarEstadoReservacion(reservacion.id, nuevoEstado).subscribe({
+                next: reservacionActualizada => {
+                    const index = this.reservaciones.findIndex(r => r.id === reservacionActualizada.id);
+                    if (index !== -1) {
+                        this.reservaciones[index] = reservacionActualizada;
+                    }
+                    this.cdr.detectChanges();
+                    Swal.fire('Estado actualizado', `Estado cambiado a "${this.getEstadoLabel(nuevoEstado)}"`, 'success');
+                },
+                error: (error) => {
+                    console.error(error);
+                    const mensaje = error.error?.message || 'No se pudo cambiar el estado';
+                    Swal.fire('Error', mensaje, 'error');
+                }
+            });
+        }
     });
-  }
+}
 }

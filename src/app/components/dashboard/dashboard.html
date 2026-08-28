@@ -3,6 +3,18 @@
 <div class="dashboard-container">
     <!-- Si estamos en la ruta raíz del dashboard, mostramos las estadísticas -->
     <ng-container *ngIf="isRootRoute">
+        <!-- Mensaje de bienvenida -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-hotel fa-3x mb-3" style="color: #004d99;"></i>
+                        <h5>Bienvenido al Sistema de Gestión Hotelera</h5>
+                        <p class="mb-0">Selecciona una opción del menú para comenzar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Tarjetas de estadísticas -->
         <div class="row g-4 mb-4">
             <!-- Huéspedes -->
@@ -78,18 +90,7 @@
             </div>
         </div>
 
-        <!-- Mensaje de bienvenida -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center text-muted">
-                        <i class="fas fa-hotel fa-3x mb-3" style="color: #004d99;"></i>
-                        <h5>Bienvenido al Sistema de Gestión Hotelera</h5>
-                        <p class="mb-0">Selecciona una opción del menú para comenzar</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </ng-container>
 
     <!-- Aquí se renderizan los componentes hijos (huespedes, habitaciones, reservas, usuarios) -->

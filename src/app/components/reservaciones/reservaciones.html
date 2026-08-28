@@ -15,7 +15,8 @@
                     <th scope="col">#</th>
                     <th scope="col">Huésped</th>
                     <th scope="col">Habitación</th>
-                    <th scope="col">Fecha y Hora</th>
+                    <th scope="col">Fecha Entrada</th>
+                    <th scope="col">Fecha Salida</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -26,6 +27,7 @@
                     <td>{{ getNombreHuesped(reservacion) }}</td>
                     <td>{{ getNumeroHabitacion(reservacion) }}</td>
                     <td>{{ formatearFecha(reservacion.fechaHora) }}</td>
+                    <td>{{ formatearFecha(reservacion.fechaSalida) }}</td>
                     <td>
                         <span class="badge bg-{{ getEstadoColor(reservacion.estadoReserva) }}">
                             {{ getEstadoLabel(reservacion.estadoReserva) }}
@@ -103,13 +105,28 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="fechaHora" class="form-label">Fecha y Hora *</label>
+                            <label for="fechaHora" class="form-label">Fecha de Entrada *</label>
                             <input id="fechaHora" type="datetime-local" class="form-control" formControlName="fechaHora" />
                             <div *ngIf="reservacionForm.get('fechaHora')?.invalid && reservacionForm.get('fechaHora')?.touched"
                                 class="text-danger small mt-1">
                                 <span *ngIf="reservacionForm.get('fechaHora')?.errors?.['required']">
-                                    La fecha y hora son requeridas
+                                    La fecha de entrada es requerida
                                 </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaSalida" class="form-label">Fecha de Salida *</label>
+                            <input id="fechaSalida" type="datetime-local" class="form-control" formControlName="fechaSalida" />
+                            <div *ngIf="reservacionForm.get('fechaSalida')?.invalid && reservacionForm.get('fechaSalida')?.touched"
+                                class="text-danger small mt-1">
+                                <span *ngIf="reservacionForm.get('fechaSalida')?.errors?.['required']">
+                                    La fecha de salida es requerida
+                                </span>
+                            </div>
+                            <div *ngIf="reservacionForm.errors?.['fechaInvalida'] && reservacionForm.get('fechaSalida')?.touched"
+                                class="text-danger small mt-1">
+                                La fecha de salida debe ser posterior a la fecha de entrada
                             </div>
                         </div>
 

@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { HuespedesService } from '../../services/huespedes';
-import { HuespedRequest, HuespedResponse, getNombreCompleto } from '../../models/Huesped.model';
+import { HuespedRequest, HuespedResponse } from '../../models/Huesped.model';
 
 declare var bootstrap: any;
 
@@ -71,8 +71,8 @@ export class Huespedes implements OnInit, AfterViewInit {
     this.selectedHuespedId = null;
   }
 
-  getNombreCompleto(huesped: HuespedResponse): string {
-    return getNombreCompleto(huesped);
+  nombre(huesped: HuespedResponse): string {
+    return this.nombre(huesped);
   }
 
   toggleForm(): void {
@@ -84,12 +84,12 @@ export class Huespedes implements OnInit, AfterViewInit {
   editarHuesped(huesped: HuespedResponse): void {
     this.isEditMode = true;
     this.selectedHuespedId = huesped.id;
-    this.textoModal = 'Actualizando huésped: ' + this.getNombreCompleto(huesped);
+    this.textoModal = 'Actualizando huésped: ' + this.nombre;
 
     this.huespedForm.patchValue({
       nombre: huesped.nombre,
-      apellidoPaterno: huesped.apellidoPaterno,
-      apellidoMaterno: huesped.apellidoMaterno,
+      apellidoPaterno: huesped.paterno,
+      apellidoMaterno: huesped.materno,
       email: huesped.email,
       telefono: huesped.telefono,
       documento: huesped.documento,
@@ -143,7 +143,7 @@ export class Huespedes implements OnInit, AfterViewInit {
 
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `El huésped ${this.getNombreCompleto(huesped)} será eliminado permanentemente`,
+      text: `El huésped ${this.nombre} será eliminado permanentemente`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
