@@ -6,5 +6,5 @@ export const environment = {
     apiUsuarios: localhost.concat(':9000/admin/usuarios'),
     apiHuespedes: localhost.concat(':8090/api/huespedes'),  // Nuevo
     apiHabitaciones: localhost.concat(':8090/api/habitaciones'), // Nuevo
-    apiReservaciones: localhost.concat(':8090/api/reservaciones'), // Nuevo
+    apiReservaciones: localhost.concat(':8090/api/reservas'), // Nuevo
 }

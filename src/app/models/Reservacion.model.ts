@@ -4,26 +4,41 @@ import { HabitacionResponse } from './Habitacion.model';
 export interface ReservacionRequest {
     idHuesped: number;
     idHabitacion: number;
-    fechaHora: string; // Formato: "dd/MM/yyyy HH:mm"
+    fechaHora: string;
+    fechaSalida: string;
 }
 
 export interface ReservacionResponse {
     id: number;
-    idHuesped: number;
-    idHabitacion: number;
+    huesped: HuespedResponse;
+    habitacion: HabitacionResponse;
     fechaHora: string;
+    fechaSalida: string;
     estadoReserva: string;
-    estadoRegistro: string;
-    huesped?: HuespedResponse;
-    habitacion?: HabitacionResponse;
 }
 
 export enum EstadoReserva {
     CONFIRMADA = 'CONFIRMADA',
     CANCELADA = 'CANCELADA',
     FINALIZADA = 'FINALIZADA',
-    PENDIENTE = 'PENDIENTE'
+    EN_CURSO = 'EN_CURSO'
 }
+
+// Mapeo de estados a códigos numéricos (según tu backend)
+export const EstadoReservaCodigo: Record<string, number> = {
+    'CONFIRMADA': 1,
+    'EN_CURSO': 2,
+    'FINALIZADA': 3,
+    'CANCELADA': 4
+};
+
+// Mapeo de códigos a estados
+export const CodigoEstadoReserva: Record<number, string> = {
+    1: 'CONFIRMADA',
+    2: 'EN_CURSO',
+    3: 'FINALIZADA',
+    4: 'CANCELADA'
+};
 
 export function formatearFecha(fechaHora: string): string {
     if (!fechaHora) return '';
@@ -40,9 +55,9 @@ export function formatearFecha(fechaHora: string): string {
 export function getEstadoReservaLabel(estado: string): string {
     const estados: Record<string, string> = {
         'CONFIRMADA': 'Confirmada',
-        'CANCELADA': 'Cancelada',
+        'EN_CURSO': 'En Curso',
         'FINALIZADA': 'Finalizada',
-        'PENDIENTE': 'Pendiente'
+        'CANCELADA': 'Cancelada'
     };
     return estados[estado] || estado;
 }
@@ -50,9 +65,14 @@ export function getEstadoReservaLabel(estado: string): string {
 export function getEstadoReservaColor(estado: string): string {
     const colores: Record<string, string> = {
         'CONFIRMADA': 'success',
-        'CANCELADA': 'danger',
+        'EN_CURSO': 'info',
         'FINALIZADA': 'secondary',
-        'PENDIENTE': 'warning'
+        'CANCELADA': 'danger'
     };
     return colores[estado] || 'primary';
+}
+
+// Obtener código numérico del estado
+export function getCodigoEstado(estado: string): number {
+    return EstadoReservaCodigo[estado] || 1; // Por defecto CONFIRMADA (1)
 }

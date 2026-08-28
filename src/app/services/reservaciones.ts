@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../enviroments/enviroments';
-import { ReservacionRequest, ReservacionResponse } from '../models/Reservacion.model';
+import { ReservacionRequest, ReservacionResponse, getCodigoEstado } from '../models/Reservacion.model';
 
 @Injectable({
   providedIn: 'root'
@@ -58,8 +58,12 @@ export class ReservacionesService {
     );
   }
 
+  // Ahora recibe el código numérico del estado
   actualizarEstadoReservacion(id: number, estado: string): Observable<ReservacionResponse> {
-    return this.http.put<ReservacionResponse>(`${this.apiUrl}/${id}/estado/${estado}`, {}).pipe(
+    const codigoEstado = getCodigoEstado(estado); // Convertir string a número
+    console.log(`📝 Cambiando estado de reserva ${id} a: ${estado} (código: ${codigoEstado})`);
+    
+    return this.http.put<ReservacionResponse>(`${this.apiUrl}/${id}/estado/${codigoEstado}`, {}).pipe(
       catchError(error => {
         console.error('Error al actualizar el estado de la reservación', error);
         return throwError(() => error);
